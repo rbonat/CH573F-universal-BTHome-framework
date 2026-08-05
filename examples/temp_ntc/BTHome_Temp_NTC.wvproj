@@ -1,0 +1,43 @@
+{
+  "version": "1.0",
+  "hasAllParsed": true,
+  "isNormalMRSProject": true,
+  "basic": {
+    "chipInfo": {"vendor": "WCH", "toolchain": "RISC-V", "series": "CH57X", "rtos": "NoneOS", "mcu": "CH573F", "artifactType": "executable", "link": "WCH-Link"},
+    "linkedFolders": [{"name": "framework", "location": "../../framework"}, {"name": "vendor", "location": "../../vendor"}],
+    "removedResources": [{"parentLogicPath": "", "type": "file", "name": "*.wvproj"}],
+    "projectName": "BTHome_Temp_NTC",
+    "architecture": "RISC-V",
+    "projectType": "c"
+  },
+  "buildConfig": {
+    "configurations": [{
+      "buildArtifact": {"artifact_name": "${ProjName}", "artifact_extension": "elf", "output_prefix": "", "artifact_type": "Executable"},
+      "parallelizationNumber": "optimal",
+      "stop_on_first_build_error": true,
+      "excludeResources": [
+        "${project}/framework/hal/KEY.c", "${project}/framework/hal/LED.c",
+        "${project}/framework/drivers/soil_sensor", "${project}/framework/drivers/aht2x", "${project}/framework/drivers/soft_i2c",
+        "${project}/vendor/ch57x_sdk/StdPeriphDriver/CH57x_usbdev.c", "${project}/vendor/ch57x_sdk/StdPeriphDriver/CH57x_usbhostClass.c", "${project}/vendor/ch57x_sdk/StdPeriphDriver/CH57x_usbhostBase.c", "${project}/vendor/ch57x_sdk/StdPeriphDriver/CH57x_pwm.c", "${project}/vendor/ch57x_sdk/StdPeriphDriver/CH57x_spi0.c", "${project}/vendor/ch57x_sdk/StdPeriphDriver/CH57x_timer1.c", "${project}/vendor/ch57x_sdk/StdPeriphDriver/CH57x_timer2.c", "${project}/vendor/ch57x_sdk/StdPeriphDriver/CH57x_timer3.c", "${project}/vendor/ch57x_sdk/StdPeriphDriver/CH57x_uart0.c", "${project}/vendor/ch57x_sdk/StdPeriphDriver/CH57x_uart2.c", "${project}/vendor/ch57x_sdk/StdPeriphDriver/CH57x_uart3.c"
+      ],
+      "optimization": {"level": "size", "char_is_signed": true, "function_sections": true, "no_common_unitialized": true},
+      "ccompiler": {
+        "preprocessor": {"defined_symbols": ["DEBUG=1"]},
+        "includes": {"include_paths": [
+          "${project}/vendor/ch57x_sdk/Startup", "${project}/app/include", "${project}/config", "${project}/framework/core/include", "${project}/framework/ble/include", "${project}/framework/drivers/ntc_temp", "${project}/framework/drivers/battery", "${project}/vendor/ch57x_sdk/StdPeriphDriver/inc", "${project}/framework/hal/include", "${project}/vendor/ch57x_sdk/Ld", "${project}/vendor/ch57x_sdk/LIB", "${project}/vendor/ch57x_sdk/RVMSIS", "${project}/framework/config"
+        ], "include_system_paths": [], "include_files": []},
+        "optimization": {"language_standard": "gnu99"}
+      },
+      "clinker": {
+        "general": {"scriptFiles": ["${project}/vendor/ch57x_sdk/Ld/Link.ld"], "do_not_use_standard_start_files": true, "remove_unused_sections": true},
+        "libraries": {"libraries": ["ISP573", "CH57xBLE"], "library_search_path": ["${project}/vendor/ch57x_sdk/LIB", "${project}/vendor/ch57x_sdk/StdPeriphDriver"]},
+        "miscellaneous": {"use_newlib_nano": true, "do_not_use_syscalls": true, "linker_flags": ["--print-memory-usage"], "generate_map": "\"${BuildArtifactFileBaseName}.map\""}
+      },
+      "riscvTargetProcessor": {"architecture": "rv32i", "multiply_extension": true, "atomic_extension": true, "floating_point": "none", "compressed_extension": true, "integer_ABI": "ilp32", "floating_point_ABI": "none", "code_model": "any", "small_data_limit": 8},
+      "component_toolchain": "${WCH:Toolchain:GCC8}",
+      "name": "obj"
+    }]
+  },
+  "flashConfig": {"mcutype": "CH57x", "address": "0x00000000", "clkSpeed": "High", "debug_interface_mode": "1-wire serial"},
+  "debugConfigurations": {"reserve": {"PROGRAM_NAME": "obj/BTHome_Temp_NTC.elf", "PROJECT_ATTR": "BTHome_Temp_NTC", "PROJECT_BUILD_CONFIG_AUTO_ATTR": true, "ATTR_BUILD_BEFORE_LAUNCH_ATTR": 2}}
+}

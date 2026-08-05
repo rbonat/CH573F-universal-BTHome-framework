@@ -1,0 +1,8 @@
+Vendor=WCH
+Toolchain=RISC-V
+Series=CH57X
+RTOS=NoneOS
+CalibrateSupport=false
+MCU=CH573F
+Link=WCH-Link
+ArtifactType=executable
