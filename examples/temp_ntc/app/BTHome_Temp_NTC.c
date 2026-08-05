@@ -62,7 +62,7 @@ uint16_t BTHome_Temp_NTC_ProcessEvent(uint8_t task_id, uint16_t events)
 
         len = bthome_v2_build_legacy_advertisement(adv, sizeof(adv),
                                                     bthome_v2_data(&bthome), bthome_v2_size(&bthome),
-                                                    NULL, true);
+                                                    BTHOME_NAME, true);
         GAPRole_SetParameter(GAPROLE_ADVERT_DATA, len, adv);
         tmos_start_task(BTHome_Temp_NTC_TaskID, TEMP_NTC_EVT, TEMP_NTC_PERIOD_MS);
         return events ^ TEMP_NTC_EVT;

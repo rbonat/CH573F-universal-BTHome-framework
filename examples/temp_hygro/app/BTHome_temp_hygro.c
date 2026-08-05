@@ -87,7 +87,7 @@ uint16_t BTHome_temp_hygro_ProcessEvent(uint8_t task_id, uint16_t events)
                                                    sizeof(adv),
                                                    bthome_v2_data(&bthome),
                                                    bthome_v2_size(&bthome),
-                                                   NULL,
+                                                   BTHOME_NAME,
                                                    true);
 
         GAPRole_SetParameter(GAPROLE_ADVERT_DATA, len, adv);

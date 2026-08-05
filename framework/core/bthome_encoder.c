@@ -357,6 +357,11 @@ uint8_t bthome_v2_build_legacy_advertisement(uint8_t *adv,
     adv[i++] = 0x01;
     adv[i++] = 0x06;
 
+    if((uint16_t)i + service_data_len + 2U > adv_capacity)
+    {
+        return 0;
+    }
+
     if(local_name)
     {
         while(*p++)
@@ -364,7 +369,8 @@ uint8_t bthome_v2_build_legacy_advertisement(uint8_t *adv,
             name_len++;
         }
 
-        if((uint8_t)(i + name_len + 2) <= adv_capacity)
+        /* Reserve space for the mandatory BTHome service data first. */
+        if((uint16_t)i + name_len + 2U + service_data_len + 2U <= adv_capacity)
         {
             adv[i++] = (uint8_t)(name_len + 1);
             adv[i++] = complete_name ? 0x09 : 0x08;
@@ -374,11 +380,6 @@ uint8_t bthome_v2_build_legacy_advertisement(uint8_t *adv,
                 adv[i++] = (uint8_t)*local_name++;
             }
         }
-    }
-
-    if((uint8_t)(i + service_data_len + 2) > adv_capacity)
-    {
-        return 0;
     }
 
     adv[i++] = (uint8_t)(service_data_len + 1);
