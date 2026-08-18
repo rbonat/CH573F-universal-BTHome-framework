@@ -8,6 +8,11 @@
 #define BTHOME_NAME          "SOIL_PWM_1"
 #define ADC_VREF_MV          1050U
 
+/* Decimal places retained by the soil sensor drivers. */
+#define BATTERY_VOLTAGE_DECIMAL_PLACES 2U
+#define SOIL_MOISTURE_DECIMAL_PLACES   0U
+#define NTC_TEMPERATURE_DECIMAL_PLACES 1U
+
 #define SOIL_EVT             0x4000
 
 /* GPIO and ADC assignments for the soil sensor example. */
@@ -36,20 +41,20 @@
 #define VBAT_DIVIDER_RATIO   2U
 #define VBAT_SETTLE_MS       3
 
-/* Calibration values for this soil sensor example. */
-#define VBAT_CAL_POINT1_RAW      2716U
-#define VBAT_CAL_POINT1_REAL_MV  4000U
-#define VBAT_CAL_POINT2_RAW      2948U
-#define VBAT_CAL_POINT2_REAL_MV  4500U
+// Battery
+#define VBAT_CAL_POINT1_RAW      2716U     // surowy odczyt ADC dla pierwszego punktu kalibracji
+#define VBAT_CAL_POINT1_REAL_MV  4000U     // rzeczywiste napiecie pierwszego punktu kalibracji [mV]
+#define VBAT_CAL_POINT2_RAW      2948U     // surowy odczyt ADC dla drugiego punktu kalibracji
+#define VBAT_CAL_POINT2_REAL_MV  4500U     // rzeczywiste napiecie drugiego punktu kalibracji [mV]
 
 /* Single-point NTC calibration near normal operating temperature. */
 #define NTC_CAL_RAW              1654U
-#define NTC_CAL_TEMP_X10         199
+#define NTC_CAL_TEMP_X10         236
 
-#define SOIL_RAW_DRY             3700
-#define SOIL_RAW_WET             1350
-#define SOIL_TEMP_REF_X10        200
-#define SOIL_TEMP_GAIN_X100      150
-#define SOIL_TEMP_OFFSET_X100    0
-
+//Soil callibration
+#define SOIL_RAW_DRY         3700         // surowy odczyt ADC odpowiadajacy 0% wilgotnosci
+#define SOIL_RAW_WET         1350        // surowy odczyt po filtracji odpowiadajacy 100% wilgotno?ci
+#define SOIL_TEMP_REF_X10    200          // temperatura kalibracji soil [0.1C], np. 20.0C
+#define SOIL_TEMP_GAIN_X100  150          // wspolczynnik dryftu soil [x100 % / 1C], 100 = 1.00% / C
+#define SOIL_TEMP_OFFSET_X100 0           // staly offset korekty soil po kompensacji temperaturowej [x100 %]
 #endif

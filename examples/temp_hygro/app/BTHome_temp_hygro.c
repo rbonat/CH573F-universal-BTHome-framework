@@ -8,7 +8,7 @@ static uint8_t BTHome_temp_hygro_TaskID;
 static uint8_t BTHome_PacketID;
 
 void BTHome_temp_hygro_Init(void)
-{
+{   
     BTHome_temp_hygro_TaskID = TMOS_ProcessEventRegister(BTHome_temp_hygro_ProcessEvent);
 
     uint8_t adv_enable = TRUE;
@@ -31,6 +31,7 @@ uint16_t BTHome_temp_hygro_ProcessEvent(uint8_t task_id, uint16_t events)
     {
         GAPRole_PeripheralStartDevice(BTHome_temp_hygro_TaskID, NULL, NULL);
         aht2x_init();
+        aht2x_release_bus();
 
         /* pierwszy pomiar po 2 s */
         tmos_start_task(BTHome_temp_hygro_TaskID, TEMP_HYGRO_EVT, 16);
@@ -59,6 +60,7 @@ uint16_t BTHome_temp_hygro_ProcessEvent(uint8_t task_id, uint16_t events)
         {
             vbat = BatterySensor_GetMilliVolts(vbat_raw);
             aht_ok = aht2x_read(&aht);
+            aht2x_release_bus();
         }
 #endif
         vbat_pct = BatterySensor_PercentFromMilliVolts(vbat);

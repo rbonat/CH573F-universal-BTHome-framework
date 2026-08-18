@@ -1,6 +1,13 @@
 #include "CONFIG.h"
 #include "soil_sensor.h"
-#include "measurement_precision.h"
+
+#ifndef SOIL_MOISTURE_DECIMAL_PLACES
+#define SOIL_MOISTURE_DECIMAL_PLACES 0U
+#endif
+
+#if (SOIL_MOISTURE_DECIMAL_PLACES > 2U)
+#error "SOIL_MOISTURE_DECIMAL_PLACES must be between 0 and 2"
+#endif
 
 typedef struct
 {

@@ -1,6 +1,13 @@
 #include "CONFIG.h"
 #include "ntc_temp.h"
-#include "measurement_precision.h"
+
+#ifndef NTC_TEMPERATURE_DECIMAL_PLACES
+#define NTC_TEMPERATURE_DECIMAL_PLACES 1U
+#endif
+
+#if (NTC_TEMPERATURE_DECIMAL_PLACES > 1U)
+#error "NTC_TEMPERATURE_DECIMAL_PLACES must be between 0 and 1"
+#endif
 
 typedef struct
 {

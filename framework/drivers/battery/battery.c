@@ -1,6 +1,13 @@
 #include "CONFIG.h"
 #include "battery.h"
-#include "measurement_precision.h"
+
+#ifndef BATTERY_VOLTAGE_DECIMAL_PLACES
+#define BATTERY_VOLTAGE_DECIMAL_PLACES 2U
+#endif
+
+#if (BATTERY_VOLTAGE_DECIMAL_PLACES > 3U)
+#error "BATTERY_VOLTAGE_DECIMAL_PLACES must be between 0 and 3"
+#endif
 
 static void BatterySensor_AdcPowerDown(void)
 {

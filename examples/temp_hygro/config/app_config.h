@@ -8,6 +8,11 @@
 #define BTHOME_NAME          "TEMP_1"
 #define ADC_VREF_MV          1050U
 
+/* Decimal places retained by the temperature, humidity and battery drivers. */
+#define BATTERY_VOLTAGE_DECIMAL_PLACES 2U
+#define AHT_TEMPERATURE_DECIMAL_PLACES 1U
+#define AHT_HUMIDITY_DECIMAL_PLACES    0U
+
 #define TEMP_HYGRO_EVT             0x4000
 
 /* GPIO and ADC assignments for the temperature/humidity example. */

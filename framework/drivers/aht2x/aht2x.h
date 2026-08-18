@@ -60,6 +60,8 @@ bool aht2x_init(void);
 bool aht2x_init_with_config(const SoftI2cConfig_t *i2c_config);
 bool aht2x_read(aht2x_data_t *data);
 bool aht2x_read_status(uint8_t *status);
+/* Put the MCU-side I2C pins in high-impedance state between measurements. */
+void aht2x_release_bus(void);
 
 #ifdef __cplusplus
 }

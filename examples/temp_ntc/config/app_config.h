@@ -8,6 +8,10 @@
 #define BTHOME_NAME              "NTC_TEMP_1"
 #define ADC_VREF_MV              1050U
 
+/* Decimal places retained by the temperature and battery drivers. */
+#define BATTERY_VOLTAGE_DECIMAL_PLACES 2U
+#define NTC_TEMPERATURE_DECIMAL_PLACES 1U
+
 #define TEMP_NTC_EVT             0x4000
 
 /* NTC divider: NTC to VCC, 33k fixed resistor to the switched low side. */

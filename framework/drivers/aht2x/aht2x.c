@@ -1,6 +1,21 @@
 #include "CONFIG.h"
 #include "aht2x.h"
-#include "measurement_precision.h"
+
+#ifndef AHT_TEMPERATURE_DECIMAL_PLACES
+#define AHT_TEMPERATURE_DECIMAL_PLACES 1U
+#endif
+
+#ifndef AHT_HUMIDITY_DECIMAL_PLACES
+#define AHT_HUMIDITY_DECIMAL_PLACES 0U
+#endif
+
+#if (AHT_TEMPERATURE_DECIMAL_PLACES > 2U)
+#error "AHT_TEMPERATURE_DECIMAL_PLACES must be between 0 and 2"
+#endif
+
+#if (AHT_HUMIDITY_DECIMAL_PLACES > 2U)
+#error "AHT_HUMIDITY_DECIMAL_PLACES must be between 0 and 2"
+#endif
 
 #define AHT2X_CMD_STATUS      0x71U
 #define AHT2X_CMD_INIT        0xBEU
@@ -140,6 +155,38 @@ bool aht2x_init_with_config(const SoftI2cConfig_t *i2c_config)
 bool aht2x_init(void)
 {
     return aht2x_init_with_config(&aht2x_default_i2c_config);
+}
+
+void aht2x_release_bus(void)
+{
+    if(!aht2x_i2c.initialized)
+    {
+        return;
+    }
+
+    /*
+     * SoftI2c leaves both lines as GPIO_ModeIN_PU after STOP.  That is
+     * convenient while communicating, but keeps the MCU pull-ups enabled
+     * for the whole sleep interval.  The next transaction re-enables them
+     * before issuing START, so the pins can be left high-impedance here.
+     */
+    if(aht2x_i2c.cfg.sda.port == SOFT_I2C_PORT_A)
+    {
+        GPIOA_ModeCfg(aht2x_i2c.cfg.sda.pin, GPIO_ModeIN_Floating);
+    }
+    else
+    {
+        GPIOB_ModeCfg(aht2x_i2c.cfg.sda.pin, GPIO_ModeIN_Floating);
+    }
+
+    if(aht2x_i2c.cfg.scl.port == SOFT_I2C_PORT_A)
+    {
+        GPIOA_ModeCfg(aht2x_i2c.cfg.scl.pin, GPIO_ModeIN_Floating);
+    }
+    else
+    {
+        GPIOB_ModeCfg(aht2x_i2c.cfg.scl.pin, GPIO_ModeIN_Floating);
+    }
 }
 
 bool aht2x_read(aht2x_data_t *data)

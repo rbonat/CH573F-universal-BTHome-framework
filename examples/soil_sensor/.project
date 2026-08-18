@@ -24,12 +24,12 @@
     <link>
       <name>framework</name>
       <type>2</type>
-      <locationURI>PARENT-2-PROJECT_LOC/framework</locationURI>
+      <location>PARENT-2-PROJECT_LOC/framework</location>
     </link>
     <link>
       <name>vendor</name>
       <type>2</type>
-      <locationURI>PARENT-2-PROJECT_LOC/vendor</locationURI>
+      <location>PARENT-2-PROJECT_LOC/vendor</location>
     </link>
   </linkedResources>
   <filteredResources>
