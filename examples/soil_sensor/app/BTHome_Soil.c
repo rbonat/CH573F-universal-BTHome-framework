@@ -61,7 +61,11 @@ uint16_t BTHome_Soil_ProcessEvent(uint8_t task_id, uint16_t events)
 
             vbat = BatterySensor_GetMilliVolts(vbat_raw);
             ntc_temp_x10 = NtcTempSensor_GetTemperatureX10(ntc_raw);
+#if SOIL_TEMPERATURE_CORRECTION_ENABLED
             moisture = SoilSensor_ApplyTemperatureCorrectionX100(SoilSensor_SoilPercentX100(soil_filtered_raw), ntc_temp_x10);
+#else
+            moisture = SoilSensor_SoilPercentX100(soil_filtered_raw);
+#endif
         }
 #endif
 

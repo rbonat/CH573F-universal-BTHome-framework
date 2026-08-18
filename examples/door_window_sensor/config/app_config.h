@@ -3,6 +3,7 @@
 
 /* TMOS/GAP time units are 625 us. */
 #define BTHOME_NAME                         "DOOR_1"
+#define ADC_VREF_MV                         1050U
 #define ADV_FAST_INTERVAL                   (160U)  /* 100 ms */
 #define ADV_SLOW_INTERVAL                   (800U)  /* 500 ms */
 

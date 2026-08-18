@@ -2,10 +2,9 @@
 #define APP_CONFIG_H
 
 /* Soil sensor application timing. TMOS/GAP units are 625 us. */
-#define SOIL_PERIOD_MS       (60 * 1600)
-#define ADV_INTERVAL         (10 * 1600)
-#define CALIBRATION_MODE     0
-#define BTHOME_NAME          "SOIL_PWM_1"
+#define SOIL_PERIOD_MS       (6 * 1600)
+#define ADV_INTERVAL         (1 * 1600)
+#define CALIBRATION_MODE     1
 #define ADC_VREF_MV          1050U
 
 /* Decimal places retained by the soil sensor drivers. */
@@ -17,7 +16,6 @@
 
 /* GPIO and ADC assignments for the soil sensor example. */
 #define STATUS_LED_PIN       GPIO_Pin_8
-
 #define SOIL_MEASURE_PIN     GPIO_Pin_9
 #define SOIL_MEASURE_ADC_IE  RB_PIN_ADC13_IE
 #define SOIL_MEASURE_ADC_CH  CH_EXTIN_13
@@ -41,20 +39,24 @@
 #define VBAT_DIVIDER_RATIO   2U
 #define VBAT_SETTLE_MS       3
 
+#define BTHOME_NAME          "SOIL_PWM_2"
+
 // Battery
-#define VBAT_CAL_POINT1_RAW      2716U     // surowy odczyt ADC dla pierwszego punktu kalibracji
-#define VBAT_CAL_POINT1_REAL_MV  4000U     // rzeczywiste napiecie pierwszego punktu kalibracji [mV]
-#define VBAT_CAL_POINT2_RAW      2948U     // surowy odczyt ADC dla drugiego punktu kalibracji
-#define VBAT_CAL_POINT2_REAL_MV  4500U     // rzeczywiste napiecie drugiego punktu kalibracji [mV]
+#define VBAT_CAL_POINT1_RAW      3420     // surowy odczyt ADC dla pierwszego punktu kalibracji
+#define VBAT_CAL_POINT1_REAL_MV  3600     // rzeczywiste napiecie pierwszego punktu kalibracji [mV]
+#define VBAT_CAL_POINT2_RAW      3980     // surowy odczyt ADC dla drugiego punktu kalibracji
+#define VBAT_CAL_POINT2_REAL_MV  4200     // rzeczywiste napiecie drugiego punktu kalibracji [mV]
 
 /* Single-point NTC calibration near normal operating temperature. */
 #define NTC_CAL_RAW              1654U
 #define NTC_CAL_TEMP_X10         236
 
 //Soil callibration
-#define SOIL_RAW_DRY         3700         // surowy odczyt ADC odpowiadajacy 0% wilgotnosci
-#define SOIL_RAW_WET         1350        // surowy odczyt po filtracji odpowiadajacy 100% wilgotno?ci
+#define SOIL_RAW_DRY      3350            // surowy odczyt ADC odpowiadajacy 0% wilgotnosci
+#define SOIL_RAW_WET      1850            // surowy odczyt po filtracji odpowiadajacy 100% wilgotnosci
+#define SOIL_TEMPERATURE_CORRECTION_ENABLED 1  // 1: wlacza, 0: wylacza korekte temperatury soil
 #define SOIL_TEMP_REF_X10    200          // temperatura kalibracji soil [0.1C], np. 20.0C
 #define SOIL_TEMP_GAIN_X100  150          // wspolczynnik dryftu soil [x100 % / 1C], 100 = 1.00% / C
 #define SOIL_TEMP_OFFSET_X100 0           // staly offset korekty soil po kompensacji temperaturowej [x100 %]
+
 #endif
