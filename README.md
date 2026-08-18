@@ -13,6 +13,7 @@ The repository keeps the original CH573 firmware behavior while reorganizing the
 - NTC temperature measurement with the existing lookup and calibration flow.
 - Battery voltage, battery percentage, and low-battery hysteresis helpers.
 - Standalone MounRiver Studio soil sensor example.
+- Standalone MounRiver Studio door/window sensor example with GPIO wake-up.
 - Repository layout prepared for future CH582 support.
 
 ## Supported MCUs
@@ -27,6 +28,7 @@ framework/              Shared BTHome, BLE, HAL, driver, and default config code
 vendor/ch57x_sdk/       WCH CH57x SDK files used by the examples
 examples/soil_sensor/   Standalone MounRiver Studio CH573 soil sensor project
 examples/temp_ntc/      Standalone MounRiver Studio CH573 NTC temperature project
+examples/door_window_sensor/ CH573 door/window contact project
 templates/new_sensor/   Minimal starting point for new sensor examples
 docs/                   Architecture, porting, and example documentation
 tools/                  Utility scripts can be added here
