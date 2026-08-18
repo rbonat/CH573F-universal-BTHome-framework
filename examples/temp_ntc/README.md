@@ -1,18 +1,25 @@
-# NTC Temperature Example
+# NTC Temperature Sensor
 
-Standalone CH573 BTHome v2 temperature sensor project for MounRiver Studio.
+Samodzielny projekt MounRiver Studio dla CH573F. Cyklicznie publikuje BTHome v2: temperaturę NTC, napięcie i procent baterii oraz `battery_low`.
 
-It advertises NTC temperature (0.1 C), battery voltage, battery percentage,
-and the low-battery boolean in non-connectable BLE advertising packets.
+## Sprzęt
 
-## Hardware
+- NTC: przełączana masa PA5, wejście ADC PA15 / ADC5.
+- Bateria: przełączana masa PA5, wejście ADC PA4 / ADC0.
+- LED stanu: PA8, aktywny stan niski.
 
-- NTC divider low side: PA5.
-- NTC ADC input: PA15 / ADC5.
-- Battery divider low side: PA5.
-- Battery ADC input: PA4 / ADC0.
-- Status LED: PA8, active low.
+## Ramka BTHome
 
-Adjust GPIO assignments, battery calibration, and the one-point NTC reference
-(`NTC_CAL_RAW`, `NTC_CAL_TEMP_X10`) in `config/app_config.h`. Import this
-directory as an existing MounRiver Studio project and build the `obj` configuration.
+`packet_id`, `battery`, `voltage` (0,001 V), `battery_low`, `temperature` (0,1 °C). Reklama jest niepołączeniowa (`ADV_NONCONN_IND`); nazwa urządzenia jest dodawana tylko przy dostępnej przestrzeni ramki.
+
+## Praca i wybudzanie
+
+Wzorzec czasowy: pierwszy pomiar następuje po 10 ms TMOS, następne co `TEMP_NTC_PERIOD_MS`. Pomiędzy pomiarami bieżąca ramka jest reklamowana z interwałem `ADV_INTERVAL` (jednostka 625 µs).
+
+## Konfiguracja i kalibracja
+
+`config/app_config.h` zawiera piny, okresy, liczbę próbek i `BTHOME_NAME`. Ustaw `VBAT_CAL_POINT*` dla kalibracji baterii. `NTC_CAL_RAW` i `NTC_CAL_TEMP_X10` definiują punkt odniesienia NTC blisko temperatury pracy; sterownik zachowuje nieliniową charakterystykę LUT.
+
+## Budowanie
+
+Zaimportuj `examples/temp_ntc` jako istniejący projekt i zbuduj konfigurację `obj`. Home Assistant wymaga pasywnego odbioru reklam BTHome.

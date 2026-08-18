@@ -1,72 +1,69 @@
-# ch57x-bthome-framework
+# CH57x BTHome Framework
 
-Reusable BTHome firmware framework for WCH CH57x BLE microcontrollers, starting from a CH573 soil sensor application.
+Modułowy framework firmware BTHome v2 dla WCH CH57x. Każdy katalog w `examples/` jest niezależnym projektem MounRiver Studio dla CH573F.
 
-The repository keeps the original CH573 firmware behavior while reorganizing the code into shared framework modules, vendor SDK files, and standalone MounRiver Studio examples. The first example advertises soil moisture, temperature, battery voltage, battery percentage, and low-battery state using BTHome v2 service data for Home Assistant discovery.
+## Zakres
 
-## Features
+- BTHome v2 w niepołączeniowych ramkach BLE legacy advertising.
+- Kodowanie obiektów, nazwa urządzenia i licznik pakietów.
+- Pomiary ADC z przełączanym dzielnikiem oraz histereza `battery_low`.
+- Uśpienie RTC i wybudzanie GPIO.
+- Konfiguracja pinów, kalibracji i harmonogramu per przykład.
 
-- BTHome v2 advertisement payload encoder.
-- CH57x BLE peripheral startup and GAP advertising support.
-- Low-power RTC sleep support from the original CH573 project.
-- Soil moisture measurement using the existing PWM/ADC algorithm.
-- NTC temperature measurement with the existing lookup and calibration flow.
-- Battery voltage, battery percentage, and low-battery hysteresis helpers.
-- Standalone MounRiver Studio soil sensor example.
-- Standalone MounRiver Studio door/window sensor example with GPIO wake-up.
-- Repository layout prepared for future CH582 support.
-
-## Supported MCUs
-
-- CH573F: supported by the included soil sensor example.
-- CH582: planned. The layout keeps vendor SDK and framework code separated so another SDK/profile target can be added without changing application structure.
-
-## Repository Structure
+## Architektura
 
 ```text
-framework/              Shared BTHome, BLE, HAL, driver, and default config code
-vendor/ch57x_sdk/       WCH CH57x SDK files used by the examples
-examples/soil_sensor/   Standalone MounRiver Studio CH573 soil sensor project
-examples/temp_ntc/      Standalone MounRiver Studio CH573 NTC temperature project
-examples/door_window_sensor/ CH573 door/window contact project
-templates/new_sensor/   Minimal starting point for new sensor examples
-docs/                   Architecture, porting, and example documentation
-tools/                  Utility scripts can be added here
+framework/
+|-- core/               enkoder BTHome v2
+|-- ble/                inicjalizacja BLE i profile wspólne
+|-- hal/                MCU, RTC, sen, LED i wejścia
+`-- drivers/            sterowniki pomiarowe
+examples/<nazwa>/       aplikacja, konfiguracja, kalibracja i projekt IDE
+vendor/ch57x_sdk/       niezmodyfikowany SDK WCH i pliki linkera
 ```
 
-## Build Instructions
+Kod aplikacji wyłącznie orkiestruje pomiar, harmonogram i publikację. Sterowniki nie tworzą zadań ani przerwań; wykonują synchroniczny pomiar i zwracają dane całkowitoliczbowe.
 
-1. Clone this repository.
-2. Open MounRiver Studio.
-3. Import `examples/soil_sensor` as an existing project.
-4. Build the `obj` configuration.
+## Sterowniki
 
-The example project uses relative linked resources for `framework/` and `vendor/`, so it can be imported from a fresh clone without machine-specific paths.
+- `battery` — ADC dzielnika, kalibracja dwupunktowa, napięcie, procent i histereza niskiej baterii.
+- `ntc_temp` — ADC NTC, filtr średniej kroczącej, LUT i kalibracja jednopunktowa.
+- `soil_sensor` — PWM/ADC sondy pojemnościowej, filtracja oraz opcjonalna kompensacja temperatury.
+- `soft_i2c` — blokujący programowy I²C typu open-drain.
+- `aht2x` — blokujący odczyt AHT20/AHT21 przez `soft_i2c`, temperatura i wilgotność fixed-point.
 
-## Home Assistant Compatibility
+## Wzorce pracy
 
-The soil sensor example emits BTHome v2 service data in non-connectable BLE advertising packets. Home Assistant can discover the sensor through a Bluetooth adapter or Bluetooth proxy that supports passive BLE advertisements.
+| Wzorzec | Przykłady | Wybudzanie | Publikacja |
+| --- | --- | --- | --- |
+| Czasowy | `soil_sensor`, `temp_ntc`, `temp_hygro` | TMOS po starcie i co okres aplikacji | Bieżąca ramka pozostaje reklamowana niepołączeniowo; interwał BLE definiuje `ADV_INTERVAL`. |
+| Zdarzeniowy | `door_window_sensor` | Zbocze GPIO kontaktronu; RTC wymusza heartbeat | Po starcie, zmianie stabilnego stanu i heartbeatcie tworzona jest nowa ramka. Reklama przechodzi przez fazę szybką i wolną, po czym jest wyłączana. |
 
-Advertised entities:
+Wartości harmonogramu są definiowane w `config/app_config.h`. Czas TMOS/GAP jest podawany w jednostkach 625 µs; okres RTC kontaktronu — w tickach 32,768 kHz. `door_window_sensor` przełącza kierunek przerwania po każdym zboczu, więc obsługuje zarówno otwarcie, jak i zamknięcie.
 
-- Battery percentage
-- Battery voltage
-- Soil moisture
-- Battery low
-- Temperature
+## Przykłady
 
-## Power-Saving Design
+| Projekt | Dane BTHome | Źródło pomiaru / zdarzenia |
+| --- | --- | --- |
+| `soil_sensor` | wilgotność gleby, temperatura NTC, napięcie i procent baterii, `battery_low` | sonda PWM/ADC, NTC, ADC baterii |
+| `temp_ntc` | temperatura NTC, napięcie i procent baterii, `battery_low` | NTC i ADC baterii |
+| `temp_hygro` | temperatura, wilgotność, napięcie i procent baterii, `battery_low` | AHT20/AHT21 po software I²C, ADC baterii |
+| `door_window_sensor` | stan otwarcia, napięcie i procent baterii, `battery_low` | kontaktron GPIO, ADC baterii |
 
-The framework preserves the original CH573 low-power behavior:
+Szczegóły sprzętu, konfiguracji, ramki i trybu pracy znajdują się w README danego przykładu.
 
-- RTC/TMOS timing remains in the HAL layer.
-- Sleep configuration remains controlled by the CH57x BLE configuration macros.
-- Sensor GPIOs are returned to floating/input states after measurements.
-- ADC and touch-key related analog blocks are powered down after sensor reads.
+## Budowanie
 
-## Roadmap
+1. Zaimportuj wybrany katalog `examples/<nazwa>` jako istniejący projekt w MounRiver Studio.
+2. Zbuduj konfigurację `obj`.
 
-- Add a CH582 example once the target SDK and linker setup are validated.
-- Add temperature/humidity and scene-switch examples.
-- Add optional helper scripts for consistency checks and generated MounRiver metadata.
-- Expand reusable BLE advertisement helpers as more examples are added.
+Projekty używają względnych linked resources do `framework/` i `vendor/`; import z czystego klonu nie wymaga ścieżek lokalnych. Konfigurację urządzenia zmieniaj w `examples/<nazwa>/config/app_config.h`.
+
+## Integracja
+
+Ramki są BTHome v2 w niepołączeniowej reklamie BLE. Home Assistant wymaga odbiornika Bluetooth lub Bluetooth Proxy odbierającego reklamy pasywne. Nazwa `BTHOME_NAME` jest dodawana tylko, jeśli mieści się w 31-bajtowej ramce BLE legacy.
+
+## Obsługiwane układy
+
+- CH573F — obsługiwany przez wszystkie bieżące przykłady.
+- CH582 — planowany; rozdzielenie aplikacji, frameworka i SDK przygotowuje osobny profil docelowy.

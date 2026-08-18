@@ -1,29 +1,27 @@
-# Door/window sensor example
+# Door/Window Sensor
 
-Standalone CH573 BTHome v2 door/window sensor for MounRiver Studio. It uses a
-reed contact on PA9, battery measurement, GPIO wake-up, and non-connectable BLE
-advertising.
+Samodzielny projekt MounRiver Studio dla CH573F. Publikuje BTHome v2 po zmianie stanu kontaktronu oraz okresowo jako heartbeat RTC.
 
-## Wiring and configuration
+## Sprzęt
 
-- `PA9` is a floating input: use an **external** pull-up or pull-down resistor.
-  The NC/NO contact may then connect the pin to either GND or VCC.
-- Set `SENSOR_OPEN_LEVEL` to the stable level that means **open** (`1` for VCC,
-  `0` for GND). Change `SENSOR_PIN` for another input.
-- Configure the battery divider and its calibration in the same file.
+- Kontaktron: PA9, wejście pływające. Należy zastosować zewnętrzny rezystor pull-up albo pull-down; styk NC/NO łączy wejście odpowiednio z VCC albo GND.
+- Bateria: przełączana masa PA5, wejście ADC PA4 / ADC0.
+- LED stanu: PA8, aktywny stan niski.
 
-## Radio and sleep behaviour
+## Ramka BTHome
 
-At boot and after a debounced open/close transition, the device sends one
-BTHome frame with the opening state, battery percentage, voltage, and low
-battery flag. It advertises three times at a 100 ms interval, then three more
-times at a 500 ms interval. The radio is then disabled completely.
+`packet_id`, `battery`, `voltage` (0,001 V), `opening`, `battery_low`. Ramka jest niepołączeniowa (`ADV_NONCONN_IND`) i oznaczona jako oparta na zdarzeniu BTHome. Nazwa urządzenia jest dodawana tylko przy dostępnej przestrzeni ramki.
 
-The fast group improves delivery to an already-scanning nearby receiver; the
-spaced group covers BLE scan windows that were not active at the instant of the
-state change. Between bursts the CH573 sleeps and wakes from either PA9 edge.
-If no edge occurs, the RTC wakes it five minutes after the last burst to send a
-fresh status/battery frame.
+## Praca i wybudzanie
 
-Import this directory as an existing MounRiver Studio project and build the
-`obj` configuration.
+Wzorzec zdarzeniowy: PA9 wybudza układ na obu zboczach; procedura ISR uzbraja przeciwne zbocze. Po filtracji `DOOR_DEBOUNCE_TMOS` nowa ramka powstaje wyłącznie, gdy stabilny stan się zmieni. RTC budzi układ najpóźniej po `DOOR_STATUS_PERIOD_S`, aby wysłać heartbeat ze stanem i baterią.
+
+Po starcie, zmianie stanu lub heartbeatcie reklama jest włączana z `ADV_FAST_INTERVAL`, następnie przełączana na `ADV_SLOW_INTERVAL` po `ADV_FAST_PHASE_TMOS`, po czym wyłączana po `ADV_SLOW_PHASE_TMOS`. Podczas bezczynności źródłami wybudzenia pozostają tylko GPIO i RTC. Wszystkie wartości TMOS/GAP mają jednostkę 625 µs; heartbeat RTC ma taktowanie 32,768 kHz.
+
+## Konfiguracja i kalibracja
+
+`config/app_config.h` zawiera piny, poziom `SENSOR_OPEN_LEVEL`, czasy debounce/reklamy/heartbeat, `BTHOME_NAME` i parametry baterii. Dostosuj `SENSOR_OPEN_LEVEL` do elektrycznego znaczenia stanu otwartego oraz `VBAT_CAL_POINT*` do dzielnika napięcia.
+
+## Budowanie
+
+Zaimportuj `examples/door_window_sensor` jako istniejący projekt i zbuduj konfigurację `obj`. Home Assistant wymaga pasywnego odbioru reklam BTHome.

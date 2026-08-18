@@ -1,50 +1,26 @@
-# Soil Sensor Example
+# Soil Sensor
 
-Standalone CH573 BTHome soil sensor example for MounRiver Studio.
+Samodzielny projekt MounRiver Studio dla CH573F. Cyklicznie publikuje BTHome v2: wilgotność gleby, temperaturę NTC, napięcie i procent baterii oraz `battery_low`.
 
-## Hardware
+## Sprzęt
 
-The example targets the original CH573 soil sensor hardware used by this project. It measures:
+- Sonda wilgotności: PWM PB14, wejście ADC PA9 / ADC13.
+- NTC: przełączana masa PA5, wejście ADC PA15 / ADC5.
+- Bateria: przełączana masa PA5, wejście ADC PA4 / ADC0.
+- LED stanu: PA8, aktywny stan niski.
 
-- Soil moisture through a PWM-driven probe and ADC input.
-- Temperature through an NTC divider.
-- Battery voltage through a switched divider.
+## Ramka BTHome
 
-## GPIO Configuration
+`packet_id`, `battery`, `voltage` (0,001 V), `moisture` (0,01 %), `battery_low`, `temperature` (0,1 °C). Reklama jest niepołączeniowa (`ADV_NONCONN_IND`); nazwa urządzenia jest dodawana tylko przy dostępnej przestrzeni ramki.
 
-GPIO and ADC assignments live in `config/app_config.h`.
+## Praca i wybudzanie
 
-Current assignments:
+Wzorzec czasowy: pierwszy pomiar następuje po 10 ms TMOS, następne co `SOIL_PERIOD_MS`. Pomiędzy pomiarami bieżąca ramka jest reklamowana z interwałem `ADV_INTERVAL` (jednostka 625 µs).
 
-- Status LED: PA8, active low.
-- Soil ADC input: PA9 / ADC13.
-- Soil PWM drive: PB14.
-- NTC divider low side: PA5.
-- NTC ADC input: PA15 / ADC5.
-- Battery divider low side: PA5.
-- Battery ADC input: PA4 / ADC0.
+## Konfiguracja i kalibracja
 
-## BTHome Entities
+`config/app_config.h` zawiera piny, okresy, liczbę próbek i `BTHOME_NAME`. Ustaw `VBAT_CAL_POINT*` dla kalibracji baterii, `NTC_CAL_RAW`/`NTC_CAL_TEMP_X10` dla jednopunktowej kalibracji NTC oraz `SOIL_RAW_DRY`/`SOIL_RAW_WET` dla zakresu sondy. Opcjonalna kompensacja temperatury jest sterowana przez `SOIL_TEMPERATURE_CORRECTION_ENABLED`, `SOIL_TEMP_REF_X10`, `SOIL_TEMP_GAIN_X100` i `SOIL_TEMP_OFFSET_X100`.
 
-The advertisement payload contains:
+## Budowanie
 
-- Packet ID
-- Battery percentage
-- Battery voltage, 0.001 V resolution
-- Moisture, 0.01 percent resolution
-- Battery low boolean
-- Temperature, 0.1 C resolution
-
-## Home Assistant Integration
-
-Use a Home Assistant Bluetooth adapter or Bluetooth proxy with passive BLE advertisement support. The device advertises BTHome v2 service data in non-connectable advertising packets.
-
-Calibration and GPIO changes should be made in `config/app_config.h`.
-
-## NTC Calibration
-
-The NTC driver uses one reference point: `NTC_CAL_RAW` and `NTC_CAL_TEMP_X10`.
-Measure the filtered ADC value at a known, stable temperature near the normal
-operating temperature, then enter that ADC value and the reference temperature
-in 0.1 C units. The driver adjusts the divider-resistor ratio while preserving
-the non-linear NTC characteristic stored in its LUT.
+Zaimportuj `examples/soil_sensor` jako istniejący projekt i zbuduj konfigurację `obj`. Home Assistant wymaga pasywnego odbioru reklam BTHome.
